@@ -1,0 +1,51 @@
+version: '3'
+
+services: 
+
+  limesurvey:
+    container_name: limesurvey
+    build:
+        context: ./limesurvey
+        dockerfile: Dockerfile
+    depends_on:
+        - db
+    environment:
+      MYSQL_HOST: db
+      MYSQL_USER: root
+      MYSQL_PORT: '3306'
+      MYSQL_PASSWORD: mynewpassword
+      MYSQL_DB: limesurvey
+    ports:
+        - 8080:80
+
+  monit:
+    build:
+      context: ./monit
+      dockerfile: Dockerfile
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "2812:2812"
+  
+  db:
+    container_name: db
+    image: mysql
+    restart: always
+    environment:
+        MYSQL_ROOT_PASSWORD: mynewpassword
+        MYSQL_DATABASE: limesurvey
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+        - "9906:3306"
+
+  adminer:
+    image: adminer
+    ports:
+      - '8888:8080'
+
+
+  
+
+volumes:
+  mysql_data: 
